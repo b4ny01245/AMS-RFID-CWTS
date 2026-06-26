@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CWTS-AMS</title>
+    <link rel="icon" href="LOGO.jpg" type="image/x-icon">
+    <style>
+        .full-page {
+            min-height: 100vh;
+            width: 100%;
+            background: linear-gradient(beige, rgba(255, 228, 196, 0.9));
+            position: relative;
+            text-align: center;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #logo {
+            text-align: left;
+            margin-top: 10px;
+            margin-left: 40px;
+        }
+
+        #logo img {
+            width: 100px;
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .head {
+            color: #8b4513;
+            margin-bottom: 10px;
+        }
+
+        nav {
+            margin-top: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #8b4513;
+            font-weight: bold;
+            font-size: 150%;
+        }
+
+        nav ul li a:hover {
+            color: #654321;
+        }
+
+        .instructorform {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            max-width: 300px;
+            margin-top: 20px;
+        }
+
+        .instructorform input {
+            width: calc(100% - 22px);
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #8b4513;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .instructorform button {
+            width: 100%;
+            padding: 10px;
+            background-color: #8b4513;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .instructorform button:hover {
+            background-color: #654321;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #8b4513;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="full-page">
+        <div id="logo">
+            <img src="LOGO.jpg" alt="ABCDG">
+        </div>
+        <h2 class="head">CIVIC WELFARE TRAINING SERVICE</h2>
+        <h2 class="head">ATTENDANCE MANAGEMENT SYSTEM USING RFID</h2>
+        <nav>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#instructions">Instructions</a></li>
+                <li><a href="#directions">Directions</a></li>
+            </ul>
+        </nav>
+        <div class="instructorform">
+            <h3>Coordinator Log In</h3>
+            <form id="instructorLoginForm">
+                <input type="text" id="rfid" name="rfid" placeholder="RFID" required>
+                <button type="button" onclick="logIn()">Log In</button>
+            </form>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <!-- About Section -->
+        <section id="about">
+            <h2>About Us</h2>
+            <p>Welcome to the Civic Welfare Training Service Attendance Management System (CWTS-AMS) using RFID. Our
+                system is designed
+                to automate and streamline the attendance tracking process for training sessions organized by the Civic
+                Welfare Training
+                Service. With CWTS-AMS, trainers can efficiently record attendance using RFID technology, eliminating
+                the need for
+                manual attendance sheets and reducing administrative overhead. Learn more about the features, benefits,
+                and development
+                team behind CWTS-AMS.</p>
+        </section>
+        <br>
+        <br>
+
+        <!-- instructions Section -->
+        <section id="instructions">
+            <h2>Instructions</h2>
+            <p>This section provides detailed instructions on how to use the CWTS-AMS effectively. Learn how trainers
+                can log in
+                securely to the system, create and manage training sessions, enroll participants, and record attendance
+                using RFID
+                scanners. Participants can also access instructions on how to register their RFID tags, check-in to
+                training sessions,
+                and view their attendance history. Whether you're a trainer or a participant, our step-by-step
+                instructions will guide
+                you through every aspect of the system.</p>
+        </section>
+        <br>
+        <br>
+
+        <!-- Directions Section -->
+        <section id="directions">
+            <h2>Directions</h2>
+            <p>Need help finding our training center? Our Directions section offers specific guidance on how to reach
+                our facility from
+                different locations. We provide detailed directions from nearby landmarks, public transportation
+                stations, and major
+                roadways. Whether you're traveling by car, bus, or train, we'll help you navigate to our training center
+                with ease.
+                Additionally, we include information on parking availability, accessibility features, and any other
+                important
+                considerations for visitors. Plan your route confidently with our comprehensive directions.</p>
+        </section>
+        <br>
+        <br>
+    </div>
+    <center>
+        <footer>© ABCDG 2024</footer>
+    </center>
+    <script src="utils.js"></script>
+    <script>
+        function logIn() {
+            // Get the RFID entered by the user
+            var rfid = document.getElementById('rfid').value.trim();
+
+            // Check if the RFID is valid
+            if (rfid === "0000909395" || rfid === "0000227855") {
+                // Valid RFID, proceed with login
+                setLoggedIn(true);
+                alert('Log in successful!');
+                window.location.href = 'dashboard.html';
+            } else {
+                // Invalid RFID, show error message
+                alert('Invalid RFID. Please enter a valid RFID.');
+                document.getElementById('rfid').value = '';
+                document.getElementById('rfid').focus();
+            }
+        }
+
+        // Allow Enter key to trigger login
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('rfid').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    logIn();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

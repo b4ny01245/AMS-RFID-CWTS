@@ -1,0 +1,91 @@
+.full-page {
+    min-height: 100vh;
+    width: 100%;
+    background: linear-gradient(beige, rgba(255, 228, 196, 0.9));
+    position: relative;
+    text-align: center;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+}
+
+#logo {
+    text-align: left;
+    margin-top: 10px;
+    margin-left: 40px;
+}
+
+#logo img {
+    width: 100px;
+    height: auto;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.head {
+    color: #8b4513;
+    margin-bottom: 10px;
+}
+
+nav {
+    margin-top: 20px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #8b4513;
+    font-weight: bold;
+    font-size: 150%;
+}
+
+nav ul li a:hover {
+    color: #654321;
+}
+
+.instructorform {
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    max-width: 300px;
+    margin-top: 20px;
+}
+
+.instructorform input {
+    width: calc(100% - 22px);
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #8b4513;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.instructorform button {
+    width: 100%;
+    padding: 10px;
+    background-color: #8b4513;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.instructorform button:hover {
+    background-color: #654321;
+}
+
+footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #8b4513;
+}

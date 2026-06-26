@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student</title>
+    <link rel="icon" href="LOGO.jpg" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: beige;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        h2 {
+            text-align: center;
+            color: #8b4513;
+            /* brown */
+        }
+
+        form {
+            background-color: #f5deb3;
+            /* beige */
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            color: #8b4513;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="submit"],
+        input[type="button"],
+        button {
+            width: calc(100% - 22px);
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #8b4513;
+            /* brown */
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button,
+        input[type="submit"],
+        input[type="button"] {
+            background-color: #8b4513;
+            /* brown */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        button:hover,
+        input[type="submit"]:hover,
+        input[type="button"]:hover {
+            background-color: #654321;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin: 10px;
+            text-decoration: none;
+            color: #8b4513;
+            font-weight: bold;
+            border: 2px solid #8b4513;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .back-btn:hover {
+            background-color: #8b4513;
+            color: #fff;
+        }
+
+        .message {
+            text-align: center;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .message.success {
+            background-color: #90EE90;
+            color: #2d5016;
+        }
+
+        .message.error {
+            background-color: #FFB6C6;
+            color: #8b0000;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #8b4513;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    <h2>Add Student</h2>
+    <div id="message"></div>
+    <form id="addStudentForm">
+        <!-- Form for adding new student data -->
+        <label for="newStudentRFID">RFID Number:</label>
+        <input type="text" id="newStudentRFID" name="rfid" placeholder="Enter RFID" required>
+
+        <label for="newStudentId">Student ID:</label>
+        <input type="text" id="newStudentId" name="studentId" placeholder="Enter Student ID" required>
+
+        <label for="newStudentName">Name:</label>
+        <input type="text" id="newStudentName" name="name" placeholder="Enter Full Name" required>
+
+        <label for="newStudentGender">Gender:</label>
+        <input type="text" id="newStudentGender" name="gender" placeholder="Enter Gender" required>
+
+        <label for="newStudentAddress">Address:</label>
+        <input type="text" id="newStudentAddress" name="address" placeholder="Enter Address" required>
+
+        <label for="newStudentContact">Contact:</label>
+        <input type="text" id="newStudentContact" name="contact" placeholder="Enter Contact Number" required>
+
+        <button type="button" onclick="addStudentData()">Add Student</button>
+    </form>
+    <center>
+        <footer>© ABCDG 2024</footer>
+    </center>
+
+    <script src="utils.js"></script>
+    <script>
+        // Function to handle form submission for adding new student data
+        function addStudentData() {
+            const rfid = document.getElementById('newStudentRFID').value.trim();
+            const studentId = document.getElementById('newStudentId').value.trim();
+            const name = document.getElementById('newStudentName').value.trim();
+            const gender = document.getElementById('newStudentGender').value.trim();
+            const address = document.getElementById('newStudentAddress').value.trim();
+            const contact = document.getElementById('newStudentContact').value.trim();
+
+            // Validation
+            if (!rfid || !studentId || !name || !gender || !address || !contact) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            // Check if RFID already exists
+            const existingStudent = getStudentByRFID(rfid);
+            if (existingStudent) {
+                showMessage('A student with this RFID already exists!', 'error');
+                return;
+            }
+
+            try {
+                const studentData = {
+                    rfid: rfid,
+                    studentId: studentId,
+                    name: name,
+                    gender: gender,
+                    address: address,
+                    contact: contact
+                };
+
+                addStudent(studentData);
+                showMessage('Student added successfully!', 'success');
+                document.getElementById("addStudentForm").reset();
+                
+                // Redirect after 1.5 seconds
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } catch (error) {
+                console.error(error);
+                showMessage('Error adding student. Please try again.', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.innerText = text;
+            msgDiv.className = 'message ' + type;
+            msgDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

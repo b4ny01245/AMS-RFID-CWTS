@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Scanner</title>
+    <link rel="icon" href="LOGO.jpg" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: beige;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        h2 {
+            text-align: center;
+            color: #8b4513;
+            /* brown */
+        }
+
+        button {
+            background-color: #8b4513;
+            /* Brown */
+            color: #fff;
+            /* White */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #654321;
+            /* Darker Brown */
+        }
+        /* Add your CSS styles for the attendance scanner */
+    </style>
+</head>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Scanner</title>
+    <style>
+        /* Add your custom styles here */
+    </style>
+</head>
+<body onload="focusRFIDInput()">
+    <h2>Attendance Scanner</h2>
+    <!-- Input field for scanning RFID and marking attendance -->
+    <input type="text" id="rfidInput" placeholder="Scan RFID to Mark Attendance" onkeyup="handleRFIDInput(event)">
+    
+    <script>
+        // Function to automatically focus on RFID input field
+        function focusRFIDInput() {
+            document.getElementById("rfidInput").focus();
+        }
+
+        // Function to handle RFID input and mark attendance
+        function handleRFIDInput(event) {
+            var rfid = event.target.value.trim();
+            if (event.keyCode === 13 && rfid) { // Check if Enter key is pressed and RFID is provided
+                // Check if the scanned RFID is allowed to mark attendance
+                if (rfid === "0000316741") {
+                    // Send the scanned RFID to mark attendance
+                    markAttendance(rfid);
+                    // Clear the input field after scanning
+                    event.target.value = '';
+                    // Keep the focus on the input field for continuous scanning
+                    event.target.focus();
+                } else {
+                    alert('RFID not allowed to mark attendance.');
+                }
+            }
+        }
+        // Function to mark attendance using scanned RFID
+        function markAttendance(rfid) {
+            // Replace 'YOUR_GOOGLE_APPS_SCRIPT_URL' with your Google Apps Script URL
+            var url = 'https://script.google.com/macros/s/AKfycby2mhY_ITnAVO9HcCXcayQoywLgNfS7X_z3iMh5ygRjXlMEDK94fn9nIZT_Yv7GWWd4XQ/exec';
+            //script.google.com/macros/s/AKfycby2mhY_ITnAVO9HcCXcayQoywLgNfS7X_z3iMh5ygRjXlMEDK94fn9nIZT_Yv7GWWd4XQ/exec
+
+            // Form data to send to Google Apps Script
+            var formData = new FormData();
+            formData.append('action', 'markAttendance');
+            formData.append('rfid', rfid);
+
+            // Send request to Google Apps Script
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors', // Set mode to 'no-cors' for cross-origin requests
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Failed to mark attendance. Please try again.');
+                    } else {
+                        alert('Attendance marked successfully!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+    </script>
+</body>
+</html>
+
+
+</html>

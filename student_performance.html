@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance</title>
+    <link rel="icon" href="LOGO.jpg" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: beige;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: #f5deb3;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+        }
+
+        h2 {
+            text-align: center;
+            color: #8b4513;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #8b4513;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        button {
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #8b4513;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #8b4513;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #654321;
+        }
+
+        .performance-display {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .performance-display.show {
+            display: block;
+        }
+
+        .student-info {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 5px solid #8b4513;
+            margin-bottom: 20px;
+        }
+
+        .student-info h3 {
+            color: #8b4513;
+            margin-top: 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #8b4513;
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .attendance-records {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .attendance-records h3 {
+            color: #8b4513;
+            text-align: center;
+        }
+
+        .attendance-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f0f0f0;
+            border-left: 4px solid #8b4513;
+            border-radius: 3px;
+        }
+
+        .attendance-item .time {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .message {
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .message.error {
+            background-color: #FFB6C6;
+            color: #8b0000;
+            border: 2px solid #8b0000;
+        }
+
+        .message.empty {
+            background-color: #87CEEB;
+            color: #00008b;
+            border: 2px solid #00008b;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin: 10px;
+            text-decoration: none;
+            color: #8b4513;
+            font-weight: bold;
+            border: 2px solid #8b4513;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .back-btn:hover {
+            background-color: #8b4513;
+            color: #fff;
+        }
+
+        .all-students {
+            margin-top: 30px;
+        }
+
+        .student-list-item {
+            background-color: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-left: 4px solid #8b4513;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .student-list-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #8b4513;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+
+    <div class="container">
+        <h2>Student Performance / Attendance Records</h2>
+
+        <div class="input-group">
+            <label for="rfidInput">Enter or Scan RFID:</label>
+            <input type="text" id="rfidInput" placeholder="Scan or type RFID here...">
+            <button onclick="searchStudent()">Search Student</button>
+        </div>
+
+        <div id="message"></div>
+
+        <div class="performance-display" id="performanceDisplay">
+            <div class="student-info" id="studentInfo"></div>
+            <div class="attendance-records" id="attendanceRecords"></div>
+        </div>
+
+        <div class="all-students" id="allStudentsContainer"></div>
+    </div>
+
+    <center>
+        <footer>© ABCDG 2024</footer>
+    </center>
+
+    <script src="utils.js"></script>
+    <script>
+        // Allow Enter key to search
+        document.getElementById('rfidInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                searchStudent();
+            }
+        });
+
+        function searchStudent() {
+            const rfid = document.getElementById('rfidInput').value.trim();
+
+            if (!rfid) {
+                showMessage('Please enter an RFID', 'error');
+                return;
+            }
+
+            const performance = getStudentPerformance(rfid);
+
+            if (!performance) {
+                showMessage('Student not found with RFID: ' + rfid, 'error');
+                return;
+            }
+
+            displayPerformance(performance);
+        }
+
+        function displayPerformance(performance) {
+            const student = performance.student;
+            const records = performance.attendanceRecords;
+
+            // Display student info
+            const studentInfo = document.getElementById('studentInfo');
+            studentInfo.innerHTML = `
+                <h3>${student.name}</h3>
+                <div class="info-row">
+                    <div class="info-label">Student ID:</div>
+                    <div class="info-value">${student.studentId}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">RFID:</div>
+                    <div class="info-value">${student.rfid}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Gender:</div>
+                    <div class="info-value">${student.gender}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Address:</div>
+                    <div class="info-value">${student.address}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Contact:</div>
+                    <div class="info-value">${student.contact}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Date Added:</div>
+                    <div class="info-value">${student.dateAdded}</div>
+                </div>
+            `;
+
+            // Display attendance records
+            const attendanceRecords = document.getElementById('attendanceRecords');
+            if (records.length === 0) {
+                attendanceRecords.innerHTML = `
+                    <h3>Attendance Records</h3>
+                    <p style="text-align: center; color: #666;">No attendance records yet</p>
+                `;
+            } else {
+                attendanceRecords.innerHTML = `
+                    <h3>Attendance Records (Total: ${records.length})</h3>
+                    ${records.map((record, index) => `
+                        <div class="attendance-item">
+                            <strong>#${index + 1}</strong>
+                            <div class="time">${record.timestamp}</div>
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            document.getElementById('performanceDisplay').classList.add('show');
+            document.getElementById('message').innerHTML = '';
+        }
+
+        function showMessage(text, type) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.innerHTML = text;
+            msgDiv.className = 'message ' + type;
+        }
+
+        // Load all students on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            displayAllStudents();
+        });
+
+        function displayAllStudents() {
+            const students = getAllStudents();
+            const container = document.getElementById('allStudentsContainer');
+
+            if (students.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #8b4513;">No students added yet.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <h3 style="color: #8b4513; margin-top: 30px;">Registered Students (${students.length})</h3>
+                ${students.map(student => `
+                    <div class="student-list-item" onclick="searchByRFID('${student.rfid}')">
+                        <strong>${student.name}</strong>
+                        <div style="font-size: 12px; color: #666;">ID: ${student.studentId} | RFID: ${student.rfid}</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function searchByRFID(rfid) {
+            document.getElementById('rfidInput').value = rfid;
+            searchStudent();
+        }
+    </script>
+</body>
+
+</html>

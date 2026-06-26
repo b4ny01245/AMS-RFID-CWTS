@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>KeyVault - Smart Key Management System</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- QR Scanner Library -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body{
+background:#0a0f14;
+color:#e8edf3;
+font-family:sans-serif;
+}
+
+.card{
+background:#151d27;
+border:1px solid #243040;
+border-radius:12px;
+padding:20px;
+}
+
+.btn{
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.btn-primary{
+background:#00d97e;
+color:black;
+}
+
+.btn-danger{
+background:#ff5c5c;
+color:white;
+}
+
+.input{
+padding:10px;
+border-radius:8px;
+border:1px solid #243040;
+background:#111820;
+width:100%;
+}
+
+.view{display:none}
+.view.active{display:block}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginView" class="view active p-6 max-w-md mx-auto">
+
+<h1 class="text-2xl mb-4">KeyVault</h1>
+<p class="mb-6">Smart Key Management System</p>
+
+<div class="card">
+
+<label>Email</label>
+<input id="emailInput" class="input" placeholder="user@company.com">
+
+<button onclick="login()" class="btn btn-primary mt-4 w-full">
+Login
+</button>
+
+</div>
+
+</div>
+
+<!-- SCANNER -->
+<div id="scannerView" class="view p-6 max-w-lg mx-auto">
+
+<div class="flex justify-between mb-6">
+<div>
+<p id="userDisplay"></p>
+<p style="opacity:0.6">Employee</p>
+</div>
+
+<button onclick="showView('adminView')" class="btn">
+Admin Panel
+</button>
+</div>
+
+<h2 class="text-xl mb-4">Scan Key</h2>
+
+<div id="reader" style="width:100%"></div>
+
+<div id="scanResult" class="card mt-6 hidden">
+
+<p class="text-sm">Asset ID</p>
+<h3 id="assetId"></h3>
+
+<p class="mt-3 text-sm">Name</p>
+<p id="assetName"></p>
+
+<p class="mt-3 text-sm">Location</p>
+<p id="assetLocation"></p>
+
+<p class="mt-3 text-sm">Status</p>
+<p id="assetStatus"></p>
+
+<div class="mt-4 flex gap-3">
+<button id="borrowBtn" onclick="borrowAsset()" class="btn btn-primary">Borrow</button>
+<button id="returnBtn" onclick="returnAsset()" class="btn btn-danger">Return</button>
+</div>
+
+</div>
+
+</div>
+
+<!-- ADMIN -->
+<div id="adminView" class="view p-6 max-w-5xl mx-auto">
+
+<div class="flex justify-between mb-6">
+<h2 class="text-xl">Admin Panel</h2>
+<button onclick="showView('scannerView')" class="btn">Back</button>
+</div>
+
+<div class="card">
+
+<input id="search" class="input mb-4" placeholder="Search assets..." onkeyup="search()">
+
+<table width="100%" id="assetTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Status</th>
+<th>Holder</th>
+<th>Location</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+</div>
+
+<div class="card mt-6">
+
+<h3 class="mb-3">Generate QR Code</h3>
+
+<input id="qrInput" class="input mb-3" placeholder="Enter Asset ID">
+
+<button onclick="generateQR()" class="btn btn-primary">Generate</button>
+
+<div class="mt-4">
+<img id="qrImage">
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let currentUser=null
+let scannedAsset=null
+
+const assets=[
+{id:"KEY-001",name:"Meeting Room A Key",status:"available",holder:"-",location:"Front Desk"},
+{id:"KEY-002",name:"Archive Room Key",status:"borrowed",holder:"John",location:"Front Desk"},
+{id:"KEY-003",name:"Server Room Key",status:"available",holder:"-",location:"Security Office"}
+]
+
+function showView(view){
+
+document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"))
+document.getElementById(view).classList.add("active")
+
+if(view==="adminView"){
+renderTable()
+}
+
+}
+
+function login(){
+
+let email=document.getElementById("emailInput").value
+
+if(!email.includes("@")){
+alert("Enter valid email")
+return
+}
+
+currentUser={
+email:email,
+name:email.split("@")[0]
+}
+
+document.getElementById("userDisplay").innerText=email
+
+showView("scannerView")
+
+startScanner()
+
+}
+
+function startScanner(){
+
+const qr=new Html5Qrcode("reader")
+
+qr.start(
+{facingMode:"environment"},
+{
+fps:10,
+qrbox:250
+},
+(code)=>{
+
+handleScan(code)
+
+qr.stop()
+
+})
+
+}
+
+function handleScan(code){
+
+const asset=assets.find(a=>a.id===code)
+
+if(!asset){
+alert("Asset not found")
+return
+}
+
+scannedAsset=asset
+
+document.getElementById("scanResult").classList.remove("hidden")
+
+document.getElementById("assetId").innerText=asset.id
+document.getElementById("assetName").innerText=asset.name
+document.getElementById("assetLocation").innerText=asset.location
+document.getElementById("assetStatus").innerText=asset.status
+
+document.getElementById("borrowBtn").style.display=asset.status==="available"?"block":"none"
+document.getElementById("returnBtn").style.display=asset.status==="borrowed"?"block":"none"
+
+}
+
+function borrowAsset(){
+
+scannedAsset.status="borrowed"
+scannedAsset.holder=currentUser.name
+
+alert("Borrowed "+scannedAsset.id)
+
+}
+
+function returnAsset(){
+
+scannedAsset.status="available"
+scannedAsset.holder="-"
+
+alert("Returned "+scannedAsset.id)
+
+}
+
+function renderTable(){
+
+const body=document.querySelector("#assetTable tbody")
+
+body.innerHTML=""
+
+assets.forEach(a=>{
+
+body.innerHTML+=`
+<tr>
+<td>${a.id}</td>
+<td>${a.name}</td>
+<td>${a.status}</td>
+<td>${a.holder}</td>
+<td>${a.location}</td>
+</tr>
+`
+
+})
+
+}
+
+function search(){
+
+const q=document.getElementById("search").value.toLowerCase()
+
+document.querySelectorAll("#assetTable tbody tr").forEach(r=>{
+
+r.style.display=r.innerText.toLowerCase().includes(q)?"":"none"
+
+})
+
+}
+
+function generateQR(){
+
+let value=document.getElementById("qrInput").value
+
+document.getElementById("qrImage").src=
+"https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl="+value
+
+}
+
+</script>
+
+</body>
+</html>

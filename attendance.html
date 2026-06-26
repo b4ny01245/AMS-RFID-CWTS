@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Scanner</title>
+    <link rel="icon" href="LOGO.jpg" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: beige;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: #f5deb3;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #8b4513;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #8b4513;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 12px;
+            border: 2px solid #8b4513;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background-color: #fff;
+            border-color: #654321;
+        }
+
+        button {
+            background-color: #8b4513;
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #654321;
+        }
+
+        .message {
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background-color: #90EE90;
+            color: #2d5016;
+            border: 2px solid #2d5016;
+        }
+
+        .message.error {
+            background-color: #FFB6C6;
+            color: #8b0000;
+            border: 2px solid #8b0000;
+        }
+
+        .message.info {
+            background-color: #87CEEB;
+            color: #00008b;
+            border: 2px solid #00008b;
+        }
+
+        .attendance-list {
+            margin-top: 30px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .attendance-item {
+            background-color: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #8b4513;
+            border-radius: 3px;
+        }
+
+        .attendance-item .name {
+            font-weight: bold;
+            color: #8b4513;
+        }
+
+        .attendance-item .time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin: 10px;
+            text-decoration: none;
+            color: #8b4513;
+            font-weight: bold;
+            border: 2px solid #8b4513;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .back-btn:hover {
+            background-color: #8b4513;
+            color: #fff;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #8b4513;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    
+    <div class="container">
+        <h2>Attendance Scanner</h2>
+        <div id="message"></div>
+
+        <div class="input-group">
+            <label for="rfidInput">Scan RFID to Mark Attendance:</label>
+            <input 
+                type="text" 
+                id="rfidInput" 
+                placeholder="Scan or type RFID here..." 
+                autofocus
+            >
+        </div>
+
+        <button onclick="clearInput()">Clear</button>
+    </div>
+
+    <div class="attendance-list">
+        <div id="attendanceContainer"></div>
+    </div>
+
+    <center>
+        <footer>© ABCDG 2024</footer>
+    </center>
+
+    <script src="utils.js"></script>
+    <script>
+        // Auto-focus on the RFID input
+        document.getElementById("rfidInput").focus();
+
+        // Handle RFID input
+        document.getElementById("rfidInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                const rfid = this.value.trim();
+                if (rfid) {
+                    handleRFIDInput(rfid);
+                    this.value = '';
+                    this.focus();
+                }
+            }
+        });
+
+        function handleRFIDInput(rfid) {
+            const result = markAttendance(rfid);
+            const messageDiv = document.getElementById('message');
+            
+            if (result.success) {
+                messageDiv.className = 'message success';
+                messageDiv.innerText = '✓ ' + result.message;
+                refreshAttendanceDisplay();
+            } else {
+                messageDiv.className = 'message error';
+                messageDiv.innerText = '✗ ' + result.message;
+            }
+
+            // Clear message after 3 seconds
+            setTimeout(() => {
+                messageDiv.innerText = '';
+                messageDiv.className = '';
+            }, 3000);
+        }
+
+        function clearInput() {
+            document.getElementById('rfidInput').value = '';
+            document.getElementById('rfidInput').focus();
+        }
+
+        function refreshAttendanceDisplay() {
+            const container = document.getElementById('attendanceContainer');
+            const attendance = getAllAttendance();
+            const today = new Date().toDateString();
+
+            // Filter today's attendance
+            const todayAttendance = attendance.filter(a => 
+                new Date(a.timestamp).toDateString() === today
+            ).reverse();
+
+            if (todayAttendance.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #8b4513;">No attendance marked yet today.</p>';
+                return;
+            }
+
+            container.innerHTML = '<h3 style="color: #8b4513; text-align: center;">Today\'s Attendance</h3>' + 
+                todayAttendance.map(item => `
+                    <div class="attendance-item">
+                        <div class="name">${item.name}</div>
+                        <div>ID: ${item.studentId}</div>
+                        <div class="time">${item.timestamp}</div>
+                    </div>
+                `).join('');
+        }
+
+        // Display initial attendance on page load
+        refreshAttendanceDisplay();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+function generatePDFReport() {
+    // Check if there are rows with data
+    if (!checkRowsWithValues()) {
+        alert("Cannot generate PDF report. No data found.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    var doc = new jsPDF();
+
+    // Logo image
+    var img = new Image();
+    img.src = 'LogoEssu.png';
+
+    img.onload = function() {
+        // Calculate image width and height
+        var imgWidth = doc.internal.pageSize.getWidth() * 0.5; // 50% of page width
+        var imgHeight = imgWidth * (img.height / img.width);
+
+        // Add the logo image to the PDF
+        doc.addImage(img, 'PNG', 10, 10, imgWidth, imgHeight); // Adjust the position as needed
+
+        // Set initial y position for text
+        var yPos = imgHeight + 20;
+           // Add title
+           doc.setFont('Helvetica', 'bold');
+                doc.setFontSize(22);
+                doc.setTextColor(0, 0, 0);
+                doc.text("IT FACILITIES INVENTORY", 60, yPos);
+                yPos += 10;
+// Define column headers
+var headers = ['RFID', 'Office Name', 'Item Name', 'Item Code', 'Item Status', 'Date Purchased', 'Date Acquired', 'Model'];
+
+// Add table headers to PDF
+doc.autoTable({
+    head: [headers],
+    startY: yPos,
+    theme: 'grid', // Change the theme to 'plain' for a single container with lines indicating rows and columns
+    styles: {
+        font: 'Helvetica',
+        fontSize: 12,
+        textColor: [0, 0, 0],
+        cellPadding: 5,
+        overflow: 'linebreak',
+        valign: 'middle', // Vertical alignment of text in cells
+    },
+    columnStyles: {
+        0: { fontStyle: 'bold', halign: 'center', cellWidth: 'wrap' }, // Align header content to the center
+    },
+    margin: { top: yPos + 5 },
+});
+
+// Get all rows in the table (excluding the header row)
+var rows = document.querySelectorAll('.data-table tr:not(:first-child)');
+
+// Iterate over each row
+rows.forEach(row => {
+    var rowData = [];
+
+    // Get all cells in the row
+    var cells = row.querySelectorAll('td');
+    // Check if any cell in the row has non-empty content
+    var rowHasData = Array.from(cells).some(cell => cell.textContent.trim() !== '');
+    if (rowHasData) {
+        // Add row data to PDF
+        cells.forEach(cell => {
+            rowData.push(cell.textContent.trim());
+        });
+        doc.autoTable({
+            body: [rowData],
+            startY: doc.lastAutoTable.finalY + 5, // Start below previous table
+            theme: 'grid', // Use the 'plain' theme for the body rows
+            styles: {
+                font: 'Helvetica',
+                fontSize: 12,
+                textColor: [0, 0, 0],
+                cellPadding: 5,
+                valign: 'middle',
+                overflow: 'linebreak' // Allow overflow text to break into multiple lines
+            }
+        });
+    }
+});
+
+
+        // Save the PDF
+        doc.save('Generated_Report.pdf');
+
+        // Add line break after the generated report
+        var lineBreak = document.createElement('hr');
+        document.getElementById('reportContainer').appendChild(lineBreak);
+    };
+}
+Write to Cris Labicane
